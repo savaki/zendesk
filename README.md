@@ -1,5 +1,7 @@
 # zendesk
 
+[![Build Status](https://snap-ci.com/savaki/zendesk/branch/master/build_image)](https://snap-ci.com/savaki/zendesk/branch/master)
+
 Work in progress implementation of the zendesk api in Go.
 
 Starting with the user api and working from there.
