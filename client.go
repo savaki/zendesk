@@ -13,7 +13,7 @@ import (
 var (
 	DomainNotSetErr = fmt.Errorf("ZENDESK_DOMAIN not set")
 	EmailNotSetErr  = fmt.Errorf("ZENDESK_EMAIL not set")
-	TokenNotSetErr  = fmt.Errorf("ZENDESK_TOKEN not set")
+	NoSecretErr     = fmt.Errorf("neither ZENDESK_TOKEN nor ZENDESK_PASSWORD set")
 )
 
 type Client struct {
@@ -48,9 +48,10 @@ func (c *Client) delete(ctx context.Context, path string, v interface{}) error {
 	return c.http.Do(ctx, "DELETE", c.toFullUrl(path), nil, nil, v)
 }
 
-func NewFromEnv() (*Client, error) {
+func FromEnv() (*Client, error) {
 	domain := os.Getenv("ZENDESK_DOMAIN")
 	email := os.Getenv("ZENDESK_EMAIL")
+	password := os.Getenv("ZENDESK_PASSWORD")
 	token := os.Getenv("ZENDESK_TOKEN")
 
 	if domain == "" {
@@ -59,18 +60,32 @@ func NewFromEnv() (*Client, error) {
 	if email == "" {
 		return nil, EmailNotSetErr
 	}
-	if token == "" {
-		return nil, TokenNotSetErr
+	if token == "" && password == "" {
+		return nil, NoSecretErr
 	}
 
-	return New(domain, email, token), nil
+	return FromToken(domain, email, token), nil
 }
 
-func New(domain, email, token string) *Client {
+func FromToken(domain, email, token string) *Client {
 	username := fmt.Sprintf("%s/token", email)
 	password := token
 	authFunc := func(req *http.Request) *http.Request {
 		req.SetBasicAuth(username, password)
+		return req
+	}
+
+	return &Client{
+		domain: domain,
+		http:   httpctx.WithAuthFunc(authFunc),
+	}
+}
+
+func FromPassword(domain, email, password string) *Client {
+	e := email
+	p := password
+	authFunc := func(req *http.Request) *http.Request {
+		req.SetBasicAuth(e, p)
 		return req
 	}
 

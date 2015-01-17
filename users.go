@@ -184,10 +184,19 @@ func (api *UserApi) Me() (User, error) {
 	return api.getUser("/api/v2/users/me.json", nil)
 }
 
-func (api *UserApi) SetPassword(id, password string) error {
-	return NotImplementedErr
+func (api *UserApi) SetPassword(id int, password string) error {
+	payload := map[string]string{
+		"password": password,
+	}
+	path := fmt.Sprintf("/api/v2/users/%d/password.json", id)
+	return api.client.post(api.context, path, payload, nil)
 }
 
-func (api *UserApi) ChangePassword(id, password string) error {
-	return NotImplementedErr
+func (api *UserApi) ChangePassword(id int, password, previousPassword string) error {
+	payload := map[string]string{
+		"password":          password,
+		"previous_password": previousPassword,
+	}
+	path := fmt.Sprintf("/api/v2/users/%d/password.json", id)
+	return api.client.put(api.context, path, payload, nil)
 }

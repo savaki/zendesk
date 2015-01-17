@@ -28,7 +28,7 @@ Search Users | GET /api/v2/users/search.json?query={query} | done
 Autocomplete Users | GET /api/v2/users/autocomplete.json?name={name} | done
 Update Profile Image | PUT /api/v2/users/{id}.json | -
 Show Current User | GET /api/v2/users/me.json | done
-Set User's Password | POST /api/v2/users/{user_id}/password.json | - 
-Change Your Password | PUT /api/v2/users/{user_id}/password.json | -
+Set User's Password | POST /api/v2/users/{user_id}/password.json | done 
+Change Your Password | PUT /api/v2/users/{user_id}/password.json | done
 
  

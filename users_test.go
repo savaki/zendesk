@@ -34,7 +34,7 @@ func TestList(t *testing.T) {
 	}
 
 	Convey("Given the user api", t, func() {
-		client, err := NewFromEnv()
+		client, err := FromEnv()
 		So(err, ShouldBeNil)
 
 		userApi := client.Users()
@@ -70,7 +70,7 @@ func TestMe(t *testing.T) {
 	}
 
 	Convey("Given the user api", t, func() {
-		client, err := NewFromEnv()
+		client, err := FromEnv()
 		So(err, ShouldBeNil)
 
 		userApi := client.Users()
@@ -104,7 +104,7 @@ func TestShow(t *testing.T) {
 	}
 
 	Convey("Given the user api", t, func() {
-		client, err := NewFromEnv()
+		client, err := FromEnv()
 		So(err, ShouldBeNil)
 
 		userApi := client.Users()
@@ -132,7 +132,7 @@ func TestRelated(t *testing.T) {
 	}
 
 	Convey("Given the user api", t, func() {
-		client, err := NewFromEnv()
+		client, err := FromEnv()
 		So(err, ShouldBeNil)
 
 		userApi := client.Users()
@@ -160,7 +160,7 @@ func TestAutocomplete(t *testing.T) {
 	}
 
 	Convey("Given the user api", t, func() {
-		client, err := NewFromEnv()
+		client, err := FromEnv()
 		So(err, ShouldBeNil)
 
 		userApi := client.Users()
@@ -188,7 +188,7 @@ func TestSearchQuery(t *testing.T) {
 	}
 
 	Convey("Given the user api", t, func() {
-		client, err := NewFromEnv()
+		client, err := FromEnv()
 		So(err, ShouldBeNil)
 
 		userApi := client.Users()
@@ -209,14 +209,14 @@ func TestSearchQuery(t *testing.T) {
 	})
 }
 
-func TestCreateAndDelete(t *testing.T) {
+func TestCreateDeleteAndManagePassword(t *testing.T) {
 	if !*runIntegrationTests {
 		t.Skip("To run this test, use: go test -integration")
 		return
 	}
 
 	Convey("Given the user api", t, func() {
-		client, err := NewFromEnv()
+		client, err := FromEnv()
 		So(err, ShouldBeNil)
 
 		Convey("When I create a new user via #Create", func() {
@@ -230,7 +230,17 @@ func TestCreateAndDelete(t *testing.T) {
 			So(err, ShouldBeNil)
 			So(user.Id, ShouldNotEqual, 0)
 
-			// test 2 - delete the user
+			// test 2 - set password
+			password := "password"
+			err = client.Users().SetPassword(user.Id, password)
+			So(err, ShouldBeNil)
+
+			userClient := FromPassword(client.domain, request.Email, password)
+			me, err := userClient.Users().Me()
+			So(err, ShouldBeNil)
+			So(me.Id, ShouldEqual, user.Id)
+
+			// test 3 - delete the user
 			deleted, err := client.Users().Delete(user.Id)
 			So(err, ShouldBeNil)
 			So(deleted.Active, ShouldBeFalse)
