@@ -36,8 +36,16 @@ func (c *Client) get(ctx context.Context, path string, params *url.Values, v int
 	return c.http.Get(ctx, c.toFullUrl(path), params, v)
 }
 
-func (c *Client) post(ctx context.Context, path string, body, v interface{}) error {
-	return c.http.Post(ctx, c.toFullUrl(path), body, v)
+func (c *Client) post(ctx context.Context, path string, payload, v interface{}) error {
+	return c.http.Post(ctx, c.toFullUrl(path), payload, v)
+}
+
+func (c *Client) put(ctx context.Context, path string, payload, v interface{}) error {
+	return c.http.Put(ctx, c.toFullUrl(path), payload, v)
+}
+
+func (c *Client) delete(ctx context.Context, path string, v interface{}) error {
+	return c.http.Do(ctx, "DELETE", c.toFullUrl(path), nil, nil, v)
 }
 
 func NewFromEnv() (*Client, error) {

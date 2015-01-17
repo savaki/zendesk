@@ -19,10 +19,10 @@ User Related Information | GET /api/v2/users/{id}/related.json | done
 Create User | POST /api/v2/users.json | -
 Merge Self With Another User | PUT /api/v2/users/me/merge.json | -
 Merge Users | PUT /api/v2/users/{user_id}/merge.json | -
-Create Many Users | POST /api/v2/users/create_many.json | -
+Create Many Users | POST /api/v2/users/create_many.json | done
 Update User | PUT /api/v2/users/{id}.json | -
 Suspend User | PUT /api/v2/users/{id}.json | -
-Delete User | DELETE /api/v2/users/{id}.json | -
+Delete User | DELETE /api/v2/users/{id}.json | done
 Search Users | GET /api/v2/users/search.json?query={query} | done
  | GET /api/v2/users/search.json?external_id={external_id} | -
 Autocomplete Users | GET /api/v2/users/autocomplete.json?name={name} | done

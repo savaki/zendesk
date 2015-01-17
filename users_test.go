@@ -1,10 +1,31 @@
 package zendesk
 
 import (
+	"encoding/json"
+	"fmt"
 	"testing"
+	"time"
 
 	. "github.com/smartystreets/goconvey/convey"
 )
+
+func TestJson(t *testing.T) {
+	Convey("Given an empty user instance", t, func() {
+		user := User{}
+
+		Convey("When I marshall it to json", func() {
+			data, err := json.Marshal(user)
+
+			Convey("Then I expect no errors", func() {
+				So(err, ShouldBeNil)
+			})
+
+			Convey("And I expect the json to be {}", func() {
+				So(string(data), ShouldEqual, "{}")
+			})
+		})
+	})
+}
 
 func TestList(t *testing.T) {
 	if !*runIntegrationTests {
@@ -184,6 +205,35 @@ func TestSearchQuery(t *testing.T) {
 			Convey("And I expect at least one user back", func() {
 				So(len(users), ShouldBeGreaterThan, 0)
 			})
+		})
+	})
+}
+
+func TestCreateAndDelete(t *testing.T) {
+	if !*runIntegrationTests {
+		t.Skip("To run this test, use: go test -integration")
+		return
+	}
+
+	Convey("Given the user api", t, func() {
+		client, err := NewFromEnv()
+		So(err, ShouldBeNil)
+
+		Convey("When I create a new user via #Create", func() {
+			request := User{
+				Name:  "Sample User",
+				Email: fmt.Sprintf("matt.ho+%d@gmail.com", time.Now().Unix()),
+			}
+
+			// test 1 - create the user
+			user, err := client.Users().Create(request)
+			So(err, ShouldBeNil)
+			So(user.Id, ShouldNotEqual, 0)
+
+			// test 2 - delete the user
+			deleted, err := client.Users().Delete(user.Id)
+			So(err, ShouldBeNil)
+			So(deleted.Active, ShouldBeFalse)
 		})
 	})
 }

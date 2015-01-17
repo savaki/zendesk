@@ -9,37 +9,37 @@ import (
 )
 
 type User struct {
-	Id                  int               `json:"id"`
-	Url                 string            `json:"url"`
-	Name                string            `json:"name"`
-	ExternalId          string            `json:"external_id"`
-	Alias               string            `json:"alias"`
-	CreatedAt           string            `json:"created_at"`
-	UpdatedAt           string            `json:"updated_at"`
-	Active              bool              `json:"active"`
-	Verified            bool              `json:"verified"`
-	Shared              bool              `json:"shared"`
-	SharedAgent         bool              `json:"shared_agent"`
-	Locale              string            `json:"locale"`
-	LocaleId            int               `json:"locale_id"`
-	TimeZone            string            `json:"time_zone"`
-	LastLoginAt         string            `json:"last_login_at"`
-	Email               string            `json:"email"`
-	Phone               string            `json:"phone"`
-	Signature           string            `json:"signature"`
-	Details             string            `json:"details"`
-	Notes               string            `json:"notes"`
-	OrganizationId      int               `json:"organization_id"`
-	Role                string            `json:"role"`
-	CustomRoleId        string            `json:"custom_role_id"`
-	Moderator           bool              `json:"moderator"`
-	TicketRestriction   string            `json:"ticket_restriction"`
-	OnlyPrivateComments bool              `json:"only_private_comments"`
-	Tags                []string          `json:"tags"`
-	Suspended           bool              `json:"suspended"`
-	RestrictedAgent     bool              `json:"restricted_agent"`
-	Photo               Attachment        `json:"photo"`
-	UserFields          map[string]string `json:"user_fields"`
+	Id                  int               `json:"id,omitempty"`
+	Url                 string            `json:"url,omitempty"`
+	Name                string            `json:"name,omitempty"`
+	ExternalId          string            `json:"external_id,omitempty"`
+	Alias               string            `json:"alias,omitempty"`
+	CreatedAt           string            `json:"created_at,omitempty"`
+	UpdatedAt           string            `json:"updated_at,omitempty"`
+	Active              bool              `json:"active,omitempty"`
+	Verified            bool              `json:"verified,omitempty"`
+	Shared              bool              `json:"shared,omitempty"`
+	SharedAgent         bool              `json:"shared_agent,omitempty"`
+	Locale              string            `json:"locale,omitempty"`
+	LocaleId            int               `json:"locale_id,omitempty"`
+	TimeZone            string            `json:"time_zone,omitempty"`
+	LastLoginAt         string            `json:"last_login_at,omitempty"`
+	Email               string            `json:"email,omitempty"`
+	Phone               string            `json:"phone,omitempty"`
+	Signature           string            `json:"signature,omitempty"`
+	Details             string            `json:"details,omitempty"`
+	Notes               string            `json:"notes,omitempty"`
+	OrganizationId      int               `json:"organization_id,omitempty"`
+	Role                string            `json:"role,omitempty"`
+	CustomRoleId        string            `json:"custom_role_id,omitempty"`
+	Moderator           bool              `json:"moderator,omitempty"`
+	TicketRestriction   string            `json:"ticket_restriction,omitempty"`
+	OnlyPrivateComments bool              `json:"only_private_comments,omitempty"`
+	Tags                []string          `json:"tags,omitempty"`
+	Suspended           bool              `json:"suspended,omitempty"`
+	RestrictedAgent     bool              `json:"restricted_agent,omitempty"`
+	Photo               *Attachment       `json:"photo,omitempty"`
+	UserFields          map[string]string `json:"user_fields,omitempty"`
 }
 
 type UserApi struct {
@@ -78,6 +78,30 @@ func (api *UserApi) getUser(path string, params *url.Values) (User, error) {
 	return response.User, nil
 }
 
+func (api *UserApi) postUser(path string, payload interface{}) (User, error) {
+	response := struct {
+		User User `json:"user"`
+	}{}
+
+	err := api.client.post(api.context, path, payload, &response)
+	if err != nil {
+		return User{}, err
+	}
+	return response.User, nil
+}
+
+func (api *UserApi) deleteUser(path string) (User, error) {
+	response := struct {
+		User User `json:"user"`
+	}{}
+
+	err := api.client.delete(api.context, path, &response)
+	if err != nil {
+		return User{}, err
+	}
+	return response.User, nil
+}
+
 func (api *UserApi) List() ([]User, error) {
 	return api.getUsers("/api/v2/users.json", nil)
 }
@@ -107,7 +131,7 @@ func (api *UserApi) Related(id int) (map[string]int, error) {
 }
 
 func (api *UserApi) Create(user User) (User, error) {
-	return User{}, NotImplementedErr
+	return api.postUser("/api/v2/users.json", map[string]User{"user": user})
 }
 
 func (api *UserApi) Merge(username, password string) (User, error) {
@@ -122,16 +146,17 @@ func (api *UserApi) CreateMany(users ...User) (JobStatus, error) {
 	return JobStatus{}, NotImplementedErr
 }
 
-func (api *UserApi) UpdateUser(id string) (User, error) {
+func (api *UserApi) UpdateUser(id int) (User, error) {
 	return User{}, NotImplementedErr
 }
 
-func (api *UserApi) Suspend(id string) (User, error) {
+func (api *UserApi) Suspend(id int) (User, error) {
 	return User{}, NotImplementedErr
 }
 
-func (api *UserApi) Delete(id string) (User, error) {
-	return User{}, NotImplementedErr
+func (api *UserApi) Delete(id int) (User, error) {
+	path := fmt.Sprintf("/api/v2/users/%d.json", id)
+	return api.deleteUser(path)
 }
 
 func (api *UserApi) SearchQuery(query string) ([]User, error) {
