@@ -223,12 +223,18 @@ func TestCreateDeleteAndManagePassword(t *testing.T) {
 			request := User{
 				Name:  "Sample User",
 				Email: fmt.Sprintf("matt.ho+%d@gmail.com", time.Now().Unix()),
+				UserFields: map[string]interface{}{
+					"text_field":    "abc",
+					"decimal_field": 123,
+				},
 			}
 
 			// test 1 - create the user
 			user, err := client.Users().Create(request)
 			So(err, ShouldBeNil)
 			So(user.Id, ShouldNotEqual, 0)
+			So(user.UserFields["text_field"], ShouldEqual, "abc")
+			So(user.UserFields["decimal_field"], ShouldEqual, 123)
 
 			// test 2 - set password
 			password := "password"
