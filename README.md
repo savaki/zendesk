@@ -6,6 +6,27 @@ Work in progress implementation of the zendesk api in Go.
 
 Starting with the user api and working from there.
 
+## Example - list users
+
+```
+package main
+
+import (
+	"log"
+	"github.com/savaki/zendesk"
+)
+
+func main() {
+	client, err := zendesk.FromEnv()
+	if err != nil { log.Fatalln(err) }
+
+	users, err := client.Users().List()
+	if err != nil { log.Fatalln(err) }
+
+	log.Printf("found %d users\n", len(users))
+}
+```
+
 # User Api
 
 Request | Path | Status
